@@ -3,6 +3,7 @@ import { connectDB } from "./src/config/db";
 import cors from 'cors';
 import multer from 'multer';
 import authRouter from "./src/routes/auth";
+import userRouter from "./src/routes/user";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api", authRouter);
+app.use("/api", userRouter);
 
 const PORT = 8910;
 connectDB();
