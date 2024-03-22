@@ -9,7 +9,7 @@ const checkDuplicateEmail = async (req: Request, res: Response, next: NextFuncti
         });
 
         if (userWithSameEmail) {
-            return res.status(400).json({ message: "Địa chỉ email đã được sử dụng" });
+            return res.status(400).json({ message: "Email address already in use" });
         }
 
         next(); 

@@ -9,10 +9,10 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   
   Jwt.verify( token!, secret, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: 'Token không hợp lệ' });
+      return res.status(401).json({ message: 'Invalide Token' });
     }
 
-    req.body.id = (decoded as JwtPayload).id;
+    req.body.userId = (decoded as JwtPayload).id;
     next(); 
   });
 };

@@ -52,7 +52,7 @@ const signUp = async (req: Request, res: Response): Promise<void> => {
             avatarImage: req.body.avatarImage,
             phoneNumber: req.body.phoneNumber,
             dataUrl: req.body.dataUrl,
-            createAt: req.body.createAt,
+            createAt: Date.now(),
             status: 'PENDING',
             validateCode: validateCode,
         });
