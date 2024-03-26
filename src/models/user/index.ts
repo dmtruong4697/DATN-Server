@@ -33,7 +33,10 @@ const UserSchema = new Schema(
         },
         createAt: {
             type: String,
-        }
+        },
+        lastSync: {
+            type: String,
+        },
     },
     {
         collection: 'User'
