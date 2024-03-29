@@ -38,9 +38,9 @@ const PostSchema = new Schema(
         ],
     },
     {
-        collection: 'User'
+        collection: 'Post'
     }
 )
 
-const UserModel = mongoose.model("User", PostSchema);
-export default UserModel;
+const PostModel = mongoose.model("User", PostSchema);
+export default PostModel;
