@@ -11,6 +11,7 @@ const message = {
     notification: {
         title: 'testtt',
         body: 'teastststt',
+        imageUrl: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4wB7v?ver=3b01',
     },
     token: registrationToken
 };

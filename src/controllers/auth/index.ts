@@ -51,6 +51,7 @@ const signUp = async (req: Request, res: Response): Promise<void> => {
             password: req.body.password,
             avatarImage: req.body.avatarImage,
             phoneNumber: req.body.phoneNumber,
+            groupIds: [],
             dataUrl: req.body.dataUrl,
             createAt: Date.now(),
             status: 'PENDING',

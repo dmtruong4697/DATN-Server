@@ -5,7 +5,6 @@ const GroupSchema = new Schema(
     {
         name: {
             type: String,
-            // required: true,
         },
         inviteCode: {
             type: String,
@@ -15,12 +14,12 @@ const GroupSchema = new Schema(
         },
         memberIds: [
             {
-                type: String,
+                type: Object,
             }
         ],
         transactionIds: [
             {
-                type: String,
+                type: Object,
             }
         ],
         createAt: {
@@ -32,5 +31,5 @@ const GroupSchema = new Schema(
     }
 )
 
-const GroupModel = mongoose.model("User", GroupSchema);
+const GroupModel = mongoose.model("Group", GroupSchema);
 export default GroupModel;

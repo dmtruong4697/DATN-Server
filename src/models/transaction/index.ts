@@ -3,8 +3,11 @@ import mongoose, { Schema, model } from "mongoose";
 
 const TransactionSchema = new Schema(
     {
+        userId: {
+            type: Object,
+        },
         groupId: {
-            type: String,
+            type: Object,
         },
         name: {
             type: String,
@@ -29,5 +32,5 @@ const TransactionSchema = new Schema(
     }
 )
 
-const TransactionModel = mongoose.model("User", TransactionSchema);
+const TransactionModel = mongoose.model("Transaction", TransactionSchema);
 export default TransactionModel;

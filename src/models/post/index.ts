@@ -7,7 +7,7 @@ const PostSchema = new Schema(
             type: String,
         },
         userId: {
-            type: String,
+            type: Object,
         },
         content: {
             type: String,
@@ -20,19 +20,19 @@ const PostSchema = new Schema(
         upvote: [
             {
                 time: String,
-                userId: String,
+                userId: Object,
             }
         ],
         downvote: [
             {
                 time: String,
-                userId: String,
+                userId: Object,
             }
         ],
         comment: [
             {
                 time: String,
-                userId: String,
+                userId: Object,
                 content: String,
             }
         ],
@@ -42,5 +42,5 @@ const PostSchema = new Schema(
     }
 )
 
-const PostModel = mongoose.model("User", PostSchema);
+const PostModel = mongoose.model("Post", PostSchema);
 export default PostModel;

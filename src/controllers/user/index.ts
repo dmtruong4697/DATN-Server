@@ -9,6 +9,7 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
                 password: 0, 
                 dataUrl: 0,
                 phoneNumber: 0,
+                groupIds: 0,
             }
         );
 
@@ -47,7 +48,7 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
 
         await user?.save();
         
-        res.json({ message: "Update successful"});
+        res.status(200).json({ message: "Update successful"});
     } catch (error) {
         res.status(500).json({ message: "controller user " + error});
     }

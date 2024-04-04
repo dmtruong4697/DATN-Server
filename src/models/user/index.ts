@@ -28,6 +28,16 @@ const UserSchema = new Schema(
         validateCode: {
             type: String,
         },
+        groupIds: [
+            {
+                type: Object,
+            }
+        ],
+        transactionIds: [
+            {
+                type: Object,
+            }
+        ],
         dataUrl: {
             type: String,
         },
