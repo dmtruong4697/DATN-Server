@@ -5,7 +5,7 @@ import { createGroup, getGroupById, joinGroupByInvitecode } from "../../controll
 const groupRouter = express.Router();
 
 groupRouter.post("/create-group", verifyToken, createGroup);
-groupRouter.post("/join-group", verifyToken, joinGroupByInvitecode);
+groupRouter.post("/join-group-by-id", verifyToken, joinGroupByInvitecode);
 groupRouter.post("/get-group", verifyToken, getGroupById);
 
 export default groupRouter;

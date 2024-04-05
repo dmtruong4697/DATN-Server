@@ -46,7 +46,8 @@ const getGroupById = async (req: Request, res: Response): Promise<void> => {
         
         const group = await GroupModel.findById(req.body.groupId);
         if (!group) res.status(404).json({ message: "Group not found" });        
-        
+        res.json({group});
+
     } catch (error) {
         res.status(500).json({ message: "controller group " + error});
     }
