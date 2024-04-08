@@ -1,5 +1,6 @@
 import { timeStamp } from "console";
 import mongoose, { Schema, model } from "mongoose";
+import NotificationModel from "../notification";
 
 const UserSchema = new Schema(
     {
@@ -47,6 +48,12 @@ const UserSchema = new Schema(
         lastSync: {
             type: String,
         },
+        notifications: [
+            {
+                notificationId: { type: Object},
+                isRead: { type: Boolean },
+            }
+        ],
     },
     {
         collection: 'User'
