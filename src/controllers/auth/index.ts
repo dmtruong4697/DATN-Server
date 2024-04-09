@@ -101,6 +101,9 @@ const login = async (req: Request, res: Response): Promise<void> => {
         if (!user) res.status(404).json({ message: "User not found" });
         
         if (user?.password !== req.body.password) res.status(401).json({ message: "Incorrect password" });
+
+        user.deviceToken.push(req.body.deviceToken);
+        await user.save();
         
         const token = Jwt.sign({ id: user?.id }, secret, {
             expiresIn: 86400,
@@ -118,4 +121,21 @@ const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export {signUp, validateEmail, login};
+const logout = async (req: Request, res: Response): Promise<void> => {
+    try {
+        
+        const user = await UserModel.findById(req.body.userId);
+
+        if (!user) res.status(404).json({ message: "User not found" });
+        
+        const tkIndex = user.deviceToken.indexOf(req.body.deviceToken);
+        if(tkIndex > -1) user.deviceToken.splice(tkIndex, 1);
+        await user.save();
+
+        res.status(200).json({ message: "Logout success" });
+    } catch (error) {
+        res.status(500).json({ message: "controller logout " + error});
+    }
+}
+
+export {signUp, validateEmail, login, logout};

@@ -48,6 +48,14 @@ const UserSchema = new Schema(
         lastSync: {
             type: String,
         },
+        deviceToken: [
+            {
+                type: String,
+            }
+        ],
+        latestActive: {
+            type: String,
+        },
         notifications: [
             {
                 notificationId: { type: Object},

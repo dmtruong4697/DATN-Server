@@ -1,24 +1,38 @@
-import express, { Request, Response } from "express";
+
+import UserModel from "../../models/user";
 import { getMessaging } from "firebase-admin/messaging";
+import { Request, Response } from "express";
 import { app } from "../../config/firebase.config";
 
-const testRouter = express.Router();
+const getTodayInactiveDeviceToken = async() : Promise<string[]> => {
+    try {
+        const deviceToken = [];
+        const users = await UserModel.find({
+            latestActive: new Date().toISOString().slice(0, 10),
+        });
 
-const registrationToken = 'c1wd4T8-QzuS920hOET6a8:APA91bFri_0BrXp5jy7Buc4HiNyodixiU8xf097umxYxO-tln4WCVAoJUGZVjHFRio7FQIkKcmpAHGNvbUVGqbV7btKHFNf8_7743-x9pU9tT4FieHqXtauXMF0_UmSL-b4-gj5EYMfY';
+        users.map(user => {
+            deviceToken.push(user.deviceToken);
+        })
 
+        return deviceToken;
+
+    } catch (error) {
+        
+    }
+}
 
 const message = {
     notification: {
         title: 'Test Notification',
         body: 'This is a Test Notification',
-        imageUrl: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4wtct?ver=23bb',
     },
-    token: registrationToken
+    tokens: getTodayInactiveDeviceToken(),
 };
 
-const sendNoti = async (req: Request, res: Response): Promise<void> => {
+const sendActiveRemindNotification = async (req: Request, res: Response): Promise<void> => {
     try {
-        await getMessaging(app).send(message)
+        await getMessaging(app).sendMulticast(message)
             .then((resp) => {
                 // Response is a message ID string.
                 console.log('Successfully sent message:', resp);
@@ -33,8 +47,3 @@ const sendNoti = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: "controller group " + error});
     }
 }
-
-testRouter.post("/send-noti", sendNoti);
-
-export default testRouter;
- 
