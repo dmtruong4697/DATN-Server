@@ -77,4 +77,22 @@ const joinGroupByInvitecode = async (req: Request, res: Response): Promise<void>
     }
 }
 
-export {createGroup, getGroupById, joinGroupByInvitecode}
+const getGroupList = async (req: Request, res: Response): Promise<void> => {
+    try {
+        
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) res.status(404).json({ message: "User not found" });   
+        const result = [];
+        user.groupIds.map((item) => {
+            result.push({
+                _id: item,
+            })
+        })     
+        res.json({groupIds: result});
+
+    } catch (error) {
+        res.status(500).json({ message: "controller group " + error});
+    }
+}
+
+export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList}
