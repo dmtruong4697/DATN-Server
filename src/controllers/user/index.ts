@@ -10,12 +10,14 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
                 dataUrl: 0,
                 phoneNumber: 0,
                 groupIds: 0,
+                deviceToken: 0,
+                notifications: 0,
+                createAt: 0,
+                transactionIds: 0,
             }
         );
 
-        if (!user) res.status(404).json({ message: "User not found" });
-        
-        res.json({user});
+        if (!user) {res.status(404).json({ message: "User not found" })} else res.json({user});
     } catch (error) {
         res.status(500).json({ message: "controller user " + error});
     }
