@@ -8,4 +8,5 @@ const sv = serviceAccount as firebaseAdmin.ServiceAccount;
 
 export const app = initializeApp({
     credential: cert(sv),
+    storageBucket: 'datn-a9176.appspot.com'
 })

@@ -7,6 +7,7 @@ import userRouter from "./src/routes/user";
 import testRouter from "./src/routes/test";
 import groupRouter from "./src/routes/group";
 import transactionRouter from "./src/routes/transaction";
+import syncRouter from "./src/routes/sync";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api", authRouter);
 app.use("/api", userRouter);
 app.use("/api", groupRouter);
 app.use("/api", transactionRouter);
+app.use("/api", syncRouter);
 app.use("/api", testRouter);
 
 const PORT = 8910;
