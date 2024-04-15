@@ -4,23 +4,8 @@ import { mkdir } from "fs";
 import multer from "multer";
 import { app } from "../../config/firebase.config";
 import {getStorage} from "firebase-admin/storage";
-
-// var storage = multer.diskStorage({
-//     destination: function (req: Request, file, cb) {
-//         mkdir(`syncData/${req.body.userId}`, { recursive: true }, (err) => {
-//             if (err) throw err;
-//           }); 
-//         // Uploads is the Upload_folder_name
-//         cb(null, `syncData/${req.body.userId}`);
-//     },
-//     filename: function (req: Request, file, cb) {
-//         cb(null, file.fieldname + "-" + Date.now() + ".json");
-//     },
-// });
-
-// const uploadUserData = multer({
-//     storage: storage,
-// })
+import UserModel from "../../models/user";
+import UserDataModel from "../../models/userData";
 
 const store = getStorage(app);
 const bucket = store.bucket();
@@ -34,9 +19,9 @@ const storageOptions = {
     }
 };
 
-const uploadUserData = multer({ storage: multer.memoryStorage() });
+const uploadData = multer({ storage: multer.memoryStorage() });
 
-const storeUserData = async (req: Request, res: Response): Promise<void> => {
+const storeData = async (req: Request, res: Response): Promise<void> => {
     try {
         if (!req.files) {
             res.status(400).json({ message: "No files to upload." });
@@ -65,4 +50,29 @@ const storeUserData = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export {uploadUserData, storeUserData}
+const uploadUserData = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) res.status(404).json({ message: "User not found" });
+
+        await UserDataModel.findByIdAndDelete(user.dataId);
+        user.dataId = {};
+        await user.save();
+
+        const userData = new UserDataModel({
+            userId: user._id,
+            loans: req.body.loans,
+            transactions: req.body.transactions,
+            transactionTypes: req.body.transactionTypes,
+            wallets: req.body.wallets,
+        });
+        await userData.save();
+
+        user.dataId = userData._id;
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Error uploading files: " + error });
+    }
+}
+
+export {uploadData, storeData, uploadUserData}

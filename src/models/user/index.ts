@@ -39,8 +39,8 @@ const UserSchema = new Schema(
                 type: Object,
             }
         ],
-        dataUrl: {
-            type: String,
+        dataId: {
+            type: Object,
         },
         createAt: {
             type: String,

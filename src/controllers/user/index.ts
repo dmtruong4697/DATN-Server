@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import UserModel from "../../models/user";
+import { getStorage } from "firebase-admin/storage";
+import { app } from "../../config/firebase.config";
+
+const store = getStorage(app);
+const bucket = store.bucket();
 
 const getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -43,10 +48,44 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
 
         if (!user) res.status(404).json({ message: "User not found" });
 
+        // //upload avatar image
+        // const file = req.file as Express.Multer.File;
+        // const uploadPromises = () => {
+        //     const filePath = `avatarImage/${user._id.toString()}/${file.originalname}`;
+        //     const fileUpload = bucket.file(filePath);
+
+        //     return fileUpload.save(file.buffer, {
+        //         metadata: {
+        //             contentType: file.mimetype,
+        //         }
+        //     });
+        // }
+        // await uploadPromises();
+
+        // Upload avatar image
+        const file = req.file;
+        // if (!file) return res.status(400).json({ message: "No file uploaded" });
+
+        const filePath = `avatarImage/${user._id.toString()}/${file.originalname}`;
+        const fileUpload = bucket.file(filePath);
+
+        await fileUpload.save(file.buffer, {
+            metadata: {
+                contentType: file.mimetype,
+            }
+        });
+
+        // Get download URL
+        const url = await fileUpload.getSignedUrl({
+            action: "read",
+            expires: '03-09-2491',
+        });
+
         const {userName, password, phoneNumber} = req.body;
         if (userName)  user!.userName = userName;
         if (password) user!.password = password;
         if (phoneNumber) user!.phoneNumber = phoneNumber;
+        if (req.file) user!.avatarImage = url.toString();
 
         await user?.save();
         
