@@ -70,6 +70,8 @@ const uploadUserData = async (req: Request, res: Response): Promise<void> => {
 
         user.dataId = userData._id;
         await user.save();
+
+        res.status(200).json({ message: "Upload user data success"});
     } catch (error) {
         res.status(500).json({ message: "Error uploading files: " + error });
     }
