@@ -9,6 +9,9 @@ const TransactionSchema = new Schema(
         groupId: {
             type: Object,
         },
+        currencyUnit: {
+            type: String,
+        },
         name: {
             type: String,
         },

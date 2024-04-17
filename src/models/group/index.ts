@@ -25,6 +25,9 @@ const GroupSchema = new Schema(
         createAt: {
             type: String,
         },
+        currencyUnit: {
+            type: String,
+        },
     },
     {
         collection: 'Group'

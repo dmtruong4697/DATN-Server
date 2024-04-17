@@ -23,6 +23,7 @@ const createGroup = async (req: Request, res: Response): Promise<void> => {
         const newGroup = new GroupModel({
             name: req.body.name,
             inviteCode: inviteCode,
+            currencyUnit: req.body.currencyUnit,
             groupOwnerId: req.body.userId,
             memberIds: [user._id],
             transactionIds: [],
@@ -95,4 +96,35 @@ const getGroupList = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList}
+const getGroupMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) res.status(404).json({ message: "User not found" });
+        
+        const group = await GroupModel.findById(req.body.groupId);
+        if (!group) res.status(404).json({ message: "Group not found" });
+
+        if(!group.memberIds.includes(user._id)) res.status(404).json({ message: "User not in group" });
+        
+        const users = [];
+        group.memberIds.forEach(async(user) => {
+            const member = await UserModel.findById(user, 
+                {
+                    password: 0, 
+                    dataUrl: 0,
+                    phoneNumber: 0,
+                    groupIds: 0,
+                    deviceToken: 0,
+                    notifications: 0,
+                    createAt: 0,
+                }
+            );
+            users.push(member);
+        })
+        res.status(200).json({users});
+    } catch (error) {
+        res.status(500).json({ message: "controller group " + error});
+    }
+}
+export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList, getGroupMember}

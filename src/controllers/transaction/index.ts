@@ -17,6 +17,7 @@ const createTransaction = async (req: Request, res: Response): Promise<void> => 
             groupId: group._id,
             name: req.body.name,
             total: req.body.total,
+            currencyUnit: group.currencyUnit,
             createAt: req.body.createAt,
             note: req.body.note,
             imageUrls: [],
@@ -41,10 +42,31 @@ const getTransactionById = async (req: Request, res: Response): Promise<void> =>
         
         const transaction = await TransactionModel.findById(req.body.transactionId);
         if (!transaction) res.status(404).json({ message: "Transaction not found" });        
-        
+        res.status(200).json({transaction});
     } catch (error) {
         res.status(500).json({ message: "controller transaction " + error});
     }
 }
 
-export {createTransaction, getTransactionById}
+const getTransactionByGroupId = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) res.status(404).json({ message: "User not found" });
+        
+        const group = await GroupModel.findById(req.body.groupId);
+        if (!group) res.status(404).json({ message: "Group not found" });
+
+        if(!group.memberIds.includes(user._id)) res.status(404).json({ message: "User not in group" });
+        
+        const transactions = await TransactionModel.find({
+            groupId: req.body.groupId,
+        });
+        if (!transactions) res.status(404).json({ message: "Transaction not found" });        
+        res.status(200).json({transactions});
+    } catch (error) {
+        res.status(500).json({ message: "controller transaction " + error});
+    }
+}
+
+export {createTransaction, getTransactionById, getTransactionByGroupId}
