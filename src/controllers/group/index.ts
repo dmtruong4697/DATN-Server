@@ -56,14 +56,21 @@ const getGroupById = async (req: Request, res: Response): Promise<void> => {
 
 const joinGroupByInvitecode = async (req: Request, res: Response): Promise<any> => {
     try {
+        const { userId, inviteCode } = req.body;
 
-        const user = await UserModel.findById(req.body.userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
         
-        const group = await GroupModel.findOne({
-            inviteCode: req.body.inviteCode,
-        });
-        if (!group) return res.status(404).json({ message: "Group not found" });        
+        const group = await GroupModel.findOne({ inviteCode: inviteCode });
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }        
+
+        if (group.memberIds.includes(user._id)) {
+            return res.status(400).json({ message: "User already in the group" });
+        }
 
         group.memberIds.push(user._id);
         await group.save();
@@ -71,10 +78,45 @@ const joinGroupByInvitecode = async (req: Request, res: Response): Promise<any> 
         user.groupIds.push(group._id);
         await user.save();
 
-        return res.status(200).json({ message: "Join Group successful", group: group});
+        return res.status(200).json({ message: "Join Group successful", group });
 
     } catch (error) {
-        return res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "Error in joining group: " + error });
+    }
+}
+
+const leaveGroupById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { userId, groupId } = req.body;
+
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const group = await GroupModel.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        const indexOfUser = group.memberIds.indexOf(user._id);
+        if (indexOfUser === -1) {
+            return res.status(400).json({ message: "User not in the group" });
+        }
+
+        group.memberIds.splice(indexOfUser, 1);
+        await group.save();
+
+        const indexOfGroup = user.groupIds.indexOf(group._id);
+        if (indexOfGroup !== -1) {
+            user.groupIds.splice(indexOfGroup, 1);
+            await user.save();
+        }
+
+        return res.status(200).json({ message: "Leave Group successful", group });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Error in leaving group: " + error });
     }
 }
 
@@ -127,4 +169,4 @@ const getGroupMember = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: "controller group " + error});
     }
 }
-export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList, getGroupMember}
+export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList, getGroupMember, leaveGroupById}
