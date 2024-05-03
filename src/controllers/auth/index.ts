@@ -113,6 +113,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
             message: "Login success",
             id: user?.id,
             userName: user?.userName,
+            avatarImage: user?.avatarImage,
             email: user?.email,
             token: token,
         });

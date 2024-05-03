@@ -34,7 +34,7 @@ const createGroup = async (req: Request, res: Response): Promise<void> => {
         await user.save();
 
         await newGroup.save();
-        res.status(201).json({ message: "Create Group Success", inviteCode: inviteCode});
+        res.status(201).json({ message: "Create Group Success", group: newGroup});
         
         
     } catch (error) {
@@ -54,16 +54,16 @@ const getGroupById = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-const joinGroupByInvitecode = async (req: Request, res: Response): Promise<void> => {
+const joinGroupByInvitecode = async (req: Request, res: Response): Promise<any> => {
     try {
 
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
         const group = await GroupModel.findOne({
             inviteCode: req.body.inviteCode,
         });
-        if (!group) res.status(404).json({ message: "Group not found" });        
+        if (!group) return res.status(404).json({ message: "Group not found" });        
 
         group.memberIds.push(user._id);
         await group.save();
@@ -71,10 +71,10 @@ const joinGroupByInvitecode = async (req: Request, res: Response): Promise<void>
         user.groupIds.push(group._id);
         await user.save();
 
-        res.status(200).json({ message: "Join Group successful"});
+        return res.status(200).json({ message: "Join Group successful", group: group});
 
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 

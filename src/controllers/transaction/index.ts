@@ -48,28 +48,28 @@ const getTransactionById = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-const getTransactionByGroupId = async (req: Request, res: Response): Promise<void> => {
+const getTransactionByGroupId = async (req: Request, res: Response): Promise<any> => {
     try {
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
         const group = await GroupModel.findById(req.body.groupId);
-        if (!group) res.status(404).json({ message: "Group not found" });
+        if (!group) return res.status(404).json({ message: "Group not found" });
 
-        if (!group.memberIds.includes(user._id)) res.status(404).json({ message: "User not in group" });
+        if (!group.memberIds.includes(user._id)) return res.status(404).json({ message: "User not in group" });
         
         const transactions = [];
         for (const itemId of group.transactionIds) {
             const transaction = await TransactionModel.findById(itemId);
             if (!transaction) {
-                res.status(404).json({ message: "Transaction not found" });
+                return res.status(404).json({ message: "Transaction not found" });
             }
             transactions.push(transaction);
         }
         
-        res.status(200).json({ transactions });
+        return res.status(200).json({ transactions });
     } catch (error) {
-        res.status(500).json({ message: "controller transaction " + error });
+        return res.status(500).json({ message: "controller transaction " + error });
     }
 }
 
