@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import UserModel from "../../models/user";
 import GroupModel from "../../models/group";
+import TransactionModel from "../../models/transaction";
 
 function generateCode(): string {
     let result = '';
@@ -169,4 +170,127 @@ const getGroupMember = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: "controller group " + error});
     }
 }
-export {createGroup, getGroupById, joinGroupByInvitecode, getGroupList, getGroupMember, leaveGroupById}
+
+const getGroupTotal = async (req: Request, res: Response): Promise<any> => {
+    try {
+
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        
+        const group = await GroupModel.findById(req.body.groupId);
+        if (!group) return res.status(404).json({ message: "Group not found" });
+
+        if(!group.memberIds.includes(user._id)) return res.status(404).json({ message: "User not in group" });
+
+        const transactions = [];
+        let total = 0;
+        for (const itemId of group.transactionIds) {
+            const transaction = await TransactionModel.findById(itemId);
+            if (!transaction) {
+                return res.status(404).json({ message: "Transaction not found" });
+            }
+            transactions.push(transaction);
+            total = total + transaction.total;
+        }
+
+        res.status(200).json({total});
+       
+    } catch (error) {
+        res.status(500).json({ message: "controller group " + error});
+    }
+}
+
+async function calculateTotalAmount(transactionIds: string[]): Promise<number> {
+    let total = 0;
+    for (const itemId of transactionIds) {
+        const transaction = await TransactionModel.findById(itemId);
+        if (transaction) {
+            total += transaction.total;
+        }
+    }
+    return total;
+}
+
+interface MemberInfo {
+    memberId: string;
+    amountOwed: number;
+    name: string;
+    image: string;
+}
+
+const splitMoney = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { groupId } = req.body;
+
+        const group = await GroupModel.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        const totalMembers = group.memberIds.length;
+        if (totalMembers === 0) {
+            return res.status(400).json({ message: "Group has no members" });
+        }
+
+        const totalAmount = await calculateTotalAmount(group.transactionIds);
+        if (totalAmount === 0) {
+            return res.status(400).json({ message: "No transactions in the group" });
+        }
+
+        const amountPerMember = totalAmount / totalMembers;
+
+        // Get user details for each member
+        const membersDetailsPromises = group.memberIds.map(async memberId => {
+            const user = await UserModel.findById(memberId);
+            return { 
+                id: user.id,
+                name: user.userName,
+                image: user.avatarImage,
+                amountOwed: amountPerMember
+            };
+        });
+
+        // Wait for all user details queries to resolve
+        const membersDetails = await Promise.all(membersDetailsPromises);
+
+        // Calculate actual amount spent by each member
+        const memberAmountSpent: { [key: string]: number } = {};
+        for (const transactionId of group.transactionIds) {
+            const transaction = await TransactionModel.findById(transactionId);
+            if (!transaction) {
+                return res.status(404).json({ message: "Transaction not found" });
+            }
+            const spenderId = transaction.userId;
+            if (!memberAmountSpent[spenderId]) {
+                memberAmountSpent[spenderId] = 0;
+            }
+            memberAmountSpent[spenderId] += transaction.total;
+        }
+
+        // Adjust the amount each member owes based on actual spending
+        for (const memberId in memberAmountSpent) {
+            const actualSpent = memberAmountSpent[memberId];
+            const memberDetail = membersDetails.find(member => member.id == memberId);
+            if (memberDetail) {
+                memberDetail.amountOwed -= actualSpent;
+            }
+        }
+
+        return res.status(200).json({ membersDetails });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Error in splitting money: " + error });
+    }
+}
+
+
+export {
+    createGroup, 
+    getGroupById, 
+    joinGroupByInvitecode, 
+    getGroupList, 
+    getGroupMember, 
+    leaveGroupById,
+    getGroupTotal,
+    splitMoney,
+}
