@@ -40,7 +40,7 @@ const sendValidateCode = async (email: string, code: string): Promise<void> => {
 
 }
 
-const signUp = async (req: Request, res: Response): Promise<void> => {
+const signUp = async (req: Request, res: Response): Promise<any> => {
     try {
 
         const validateCode = generateCode();
@@ -61,46 +61,46 @@ const signUp = async (req: Request, res: Response): Promise<void> => {
         await newUser.save();
         sendValidateCode(req.body.email, validateCode);
 
-        res.status(201).json({ message: "Sign Up Success"});
+        return res.status(201).json({ message: "Sign Up Success"});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-const validateEmail = async (req: Request, res: Response): Promise<void> => {
+const validateEmail = async (req: Request, res: Response): Promise<any> => {
     try {
 
         const pendingUser = await UserModel.findOne({
             email: req.body.email
         });
 
-        if (!pendingUser) res.status(404).json({ message: "Người dùng không tồn tại" });
+        if (!pendingUser) return res.status(404).json({ message: "Người dùng không tồn tại" });
 
         if(pendingUser?.validateCode == req.body.validateCode) {
             pendingUser!.status = "VALIDATED";
             pendingUser!.validateCode = "";
-        } else res.status(401).json({ message: "Incorrect Validate Code" });
+        } else return res.status(401).json({ message: "Incorrect Validate Code" });
 
         await pendingUser?.save();
-        res.status(200).json({ message: "Validated User" });
+        return res.status(200).json({ message: "Validated User" });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-const login = async (req: Request, res: Response): Promise<void> => {
+const login = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findOne({
             email: req.body.email,
         });
 
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
-        if (user?.password !== req.body.password) res.status(401).json({ message: "Incorrect password" });
+        if (user?.password !== req.body.password) return res.status(401).json({ message: "Incorrect password" });
 
         user.deviceToken.push(req.body.deviceToken);
         await user.save();
@@ -109,7 +109,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
             expiresIn: 86400,
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Login success",
             id: user?.id,
             userName: user?.userName,
@@ -118,24 +118,24 @@ const login = async (req: Request, res: Response): Promise<void> => {
             token: token,
         });
     } catch (error) {
-        res.status(500).json({ message: "controller login " + error});
+        return res.status(500).json({ message: "controller login " + error});
     }
 }
 
-const logout = async (req: Request, res: Response): Promise<void> => {
+const logout = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
 
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
         const tkIndex = user.deviceToken.indexOf(req.body.deviceToken);
         if(tkIndex > -1) user.deviceToken.splice(tkIndex, 1);
         await user.save();
 
-        res.status(200).json({ message: "Logout success" });
+        return res.status(200).json({ message: "Logout success" });
     } catch (error) {
-        res.status(500).json({ message: "controller logout " + error});
+        return res.status(500).json({ message: "controller logout " + error});
     }
 }
 

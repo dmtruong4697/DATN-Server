@@ -21,7 +21,7 @@ const storageOptions = {
 
 const uploadData = multer({ storage: multer.memoryStorage() });
 
-const storeData = async (req: Request, res: Response): Promise<void> => {
+const storeData = async (req: Request, res: Response): Promise<any> => {
     try {
         if (!req.files) {
             res.status(400).json({ message: "No files to upload." });
@@ -44,16 +44,16 @@ const storeData = async (req: Request, res: Response): Promise<void> => {
 
         await Promise.all(uploadPromises);
 
-        res.status(200).json({ message: "Files uploaded successfully." });
+        return res.status(200).json({ message: "Files uploaded successfully." });
     } catch (error) {
-        res.status(500).json({ message: "Error uploading files: " + error });
+        return res.status(500).json({ message: "Error uploading files: " + error });
     }
 }
 
-const uploadUserData = async (req: Request, res: Response): Promise<void> => {
+const uploadUserData = async (req: Request, res: Response): Promise<any> => {
     try {
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
         await UserDataModel.findByIdAndDelete(user.dataId);
         user.dataId = {};
@@ -71,9 +71,9 @@ const uploadUserData = async (req: Request, res: Response): Promise<void> => {
         user.dataId = userData._id;
         await user.save();
 
-        res.status(200).json({ message: "Upload user data success"});
+        return res.status(200).json({ message: "Upload user data success"});
     } catch (error) {
-        res.status(500).json({ message: "Error uploading files: " + error });
+        return res.status(500).json({ message: "Error uploading files: " + error });
     }
 }
 

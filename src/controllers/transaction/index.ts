@@ -3,14 +3,14 @@ import UserModel from "../../models/user";
 import GroupModel from "../../models/group";
 import TransactionModel from "../../models/transaction";
 
-const createTransaction = async (req: Request, res: Response): Promise<void> => {
+const createTransaction = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
         const group = await GroupModel.findById(req.body.groupId);
-        if( !group) res.status(404).json({ message: "Group not found" });
+        if( !group) return res.status(404).json({ message: "Group not found" });
 
         const newTransaction = new TransactionModel({
             userId: user._id,
@@ -29,22 +29,22 @@ const createTransaction = async (req: Request, res: Response): Promise<void> => 
         await group.save();
 
         await newTransaction.save();
-        res.status(201).json({ message: "Create Transaction Success"});
+        return res.status(201).json({ message: "Create Transaction Success"});
         
         
     } catch (error) {
-        res.status(500).json({ message: "controller transaction " + error});
+        return res.status(500).json({ message: "controller transaction " + error});
     }
 }
 
-const getTransactionById = async (req: Request, res: Response): Promise<void> => {
+const getTransactionById = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const transaction = await TransactionModel.findById(req.body.transactionId);
-        if (!transaction) res.status(404).json({ message: "Transaction not found" });        
-        res.status(200).json({transaction});
+        if (!transaction) return res.status(404).json({ message: "Transaction not found" });        
+        return res.status(200).json({transaction});
     } catch (error) {
-        res.status(500).json({ message: "controller transaction " + error});
+        return res.status(500).json({ message: "controller transaction " + error});
     }
 }
 

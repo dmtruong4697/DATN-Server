@@ -13,11 +13,11 @@ function generateCode(): string {
     return result;
 }
 
-const createGroup = async (req: Request, res: Response): Promise<void> => {
+const createGroup = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
         const inviteCode = generateCode();
 
@@ -35,23 +35,23 @@ const createGroup = async (req: Request, res: Response): Promise<void> => {
         await user.save();
 
         await newGroup.save();
-        res.status(201).json({ message: "Create Group Success", group: newGroup});
+        return res.status(201).json({ message: "Create Group Success", group: newGroup});
         
         
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 
-const getGroupById = async (req: Request, res: Response): Promise<void> => {
+const getGroupById = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const group = await GroupModel.findById(req.body.groupId);
-        if (!group) res.status(404).json({ message: "Group not found" });        
-        res.json({group});
+        if (!group) return res.status(404).json({ message: "Group not found" });        
+        return res.json({group});
 
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 
@@ -121,34 +121,34 @@ const leaveGroupById = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-const getGroupList = async (req: Request, res: Response): Promise<void> => {
+const getGroupList = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });   
+        if (!user) return res.status(404).json({ message: "User not found" });   
         const result = [];
         user.groupIds.map((item) => {
             result.push({
                 _id: item,
             })
         })     
-        res.json({groupIds: result});
+        return res.json({groupIds: result});
 
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 
-const getGroupMember = async (req: Request, res: Response): Promise<void> => {
+const getGroupMember = async (req: Request, res: Response): Promise<any> => {
     try {
 
         const user = await UserModel.findById(req.body.userId);
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
         const group = await GroupModel.findById(req.body.groupId);
-        if (!group) res.status(404).json({ message: "Group not found" });
+        if (!group) return res.status(404).json({ message: "Group not found" });
 
-        if(!group.memberIds.includes(user._id)) res.status(404).json({ message: "User not in group" });
+        if(!group.memberIds.includes(user._id)) return res.status(404).json({ message: "User not in group" });
         
         const users = [];
         group.memberIds.forEach(async(user) => {
@@ -165,9 +165,9 @@ const getGroupMember = async (req: Request, res: Response): Promise<void> => {
             );
             users.push(member);
         })
-        res.status(200).json({users});
+        return res.status(200).json({users});
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 
@@ -193,10 +193,10 @@ const getGroupTotal = async (req: Request, res: Response): Promise<any> => {
             total = total + transaction.total;
         }
 
-        res.status(200).json({total});
+        return res.status(200).json({total});
        
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        return res.status(500).json({ message: "controller group " + error});
     }
 }
 

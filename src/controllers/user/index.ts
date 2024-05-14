@@ -6,7 +6,7 @@ import { app } from "../../config/firebase.config";
 const store = getStorage(app);
 const bucket = store.bucket();
 
-const getUserById = async (req: Request, res: Response): Promise<void> => {
+const getUserById = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId, 
@@ -22,49 +22,35 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
             }
         );
 
-        if (!user) {res.status(404).json({ message: "User not found" })} else res.json({user});
+        if (!user) {return res.status(404).json({ message: "User not found" })} else return res.json({user});
     } catch (error) {
-        res.status(500).json({ message: "controller user " + error});
+        return res.status(500).json({ message: "controller user " + error});
     }
 }
 
-const getProfile = async (req: Request, res: Response): Promise<void> => {
+const getProfile = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
 
-        if (!user) res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
         
-        res.json({user});
+        return res.json({user});
     } catch (error) {
-        res.status(500).json({ message: "controller user " + error});
+        return res.status(500).json({ message: "controller user " + error});
     }
 }
 
-const updateProfile = async (req: Request, res: Response): Promise<void> => {
+const updateProfile = async (req: Request, res: Response): Promise<any> => {
     try {
         
         const user = await UserModel.findById(req.body.userId);
 
-        if (!user) res.status(404).json({ message: "User not found" });
-
-        // //upload avatar image
-        // const file = req.file as Express.Multer.File;
-        // const uploadPromises = () => {
-        //     const filePath = `avatarImage/${user._id.toString()}/${file.originalname}`;
-        //     const fileUpload = bucket.file(filePath);
-
-        //     return fileUpload.save(file.buffer, {
-        //         metadata: {
-        //             contentType: file.mimetype,
-        //         }
-        //     });
-        // }
-        // await uploadPromises();
+        if (!user) return res.status(404).json({ message: "User not found" });
 
         // Upload avatar image
         const file = req.file;
-        // if (!file) return res.status(400).json({ message: "No file uploaded" });
+        if (!file) return res.status(400).json({ message: "No file uploaded" });
 
         const filePath = `avatarImage/${user._id.toString()}/${file.originalname}`;
         const fileUpload = bucket.file(filePath);
@@ -89,9 +75,9 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
 
         await user?.save();
         
-        res.status(200).json({ message: "Update successful"});
+        return res.status(200).json({ message: "Update successful"});
     } catch (error) {
-        res.status(500).json({ message: "controller user " + error});
+        return res.status(500).json({ message: "controller user " + error});
     }
 }
 
