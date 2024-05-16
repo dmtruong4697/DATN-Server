@@ -1,11 +1,17 @@
 import express from "express";
-import { getProfile, getUserById, updateProfile } from "../../controllers/user";
+import { avatarStorage, getProfile, getUserById, updateAvatarImage, updateProfile } from "../../controllers/user";
 import { verifyToken } from "../../middlewares/verifyToken";
+import multer from "multer";
 
 const userRouter = express.Router();
+
+const upload = multer({
+    storage: avatarStorage,
+})
 
 userRouter.post("/user-detail", getUserById);
 userRouter.post("/profile-detail", verifyToken, getProfile);
 userRouter.post("/update-profile", verifyToken, updateProfile);
+userRouter.post("/update-avatar", upload.single('file'), verifyToken, updateAvatarImage);
 
 export default userRouter;
