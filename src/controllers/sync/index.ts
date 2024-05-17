@@ -65,6 +65,10 @@ const uploadUserData = async (req: Request, res: Response): Promise<any> => {
             transactions: req.body.transactions,
             transactionTypes: req.body.transactionTypes,
             wallets: req.body.wallets,
+            budgets: req.body.budgets,
+            savings: req.body.savings,
+            shoppingLists: req.body.shoppingLists,
+            shoppingListItems: req.body.shoppingListItems,
         });
         await userData.save();
 

@@ -26,6 +26,26 @@ const UserDataSchema = new Schema(
                 type: Object,
             }
         ],
+        budgets: [
+            {
+                type: Object,
+            }
+        ],
+        savings: [
+            {
+                type: Object,
+            }
+        ],
+        shoppingLists: [
+            {
+                type: Object,
+            }
+        ],
+        shoppingListItems: [
+            {
+                type: Object,
+            }
+        ],
     },
     {
         collection: 'UserData'
