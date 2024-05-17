@@ -116,6 +116,7 @@ const login = async (req: Request, res: Response): Promise<any> => {
             userName: user?.userName,
             avatarImage: user?.avatarImage,
             email: user?.email,
+            phoneNumber: user?.phoneNumber,
             token: token,
         });
     } catch (error) {
