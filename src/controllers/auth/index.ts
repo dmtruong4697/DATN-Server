@@ -49,10 +49,10 @@ const signUp = async (req: Request, res: Response): Promise<any> => {
             userName: req.body.userName,
             email: req.body.email,
             password: req.body.password,
-            avatarImage: req.body.avatarImage,
+            avatarImage: '',
             phoneNumber: req.body.phoneNumber,
             groupIds: [],
-            dataUrl: req.body.dataUrl,
+            dataUrl: '',
             createAt: Date.now(),
             status: 'PENDING',
             validateCode: validateCode,
@@ -75,7 +75,7 @@ const validateEmail = async (req: Request, res: Response): Promise<any> => {
             email: req.body.email
         });
 
-        if (!pendingUser) return res.status(404).json({ message: "Người dùng không tồn tại" });
+        if (!pendingUser) return res.status(404).json({ message: "User not found" });
 
         if(pendingUser?.validateCode == req.body.validateCode) {
             pendingUser!.status = "VALIDATED";
