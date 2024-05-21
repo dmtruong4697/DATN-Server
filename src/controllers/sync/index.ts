@@ -81,4 +81,18 @@ const uploadUserData = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-export {uploadData, storeData, uploadUserData}
+const getUserDataById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        if(user?.dataId != req.body.dataId) return res.status(404).json({ message: "No permitsion" });
+        
+        const data = await UserDataModel.findById(req.body.dataId);
+        if (!data) return res.status(404).json({ message: "No data" });        
+        return res.status(200).json({data: data});
+    } catch (error) {
+        return res.status(500).json({ message: "controller sync " + error});
+    }
+}
+
+export {uploadData, storeData, uploadUserData, getUserDataById}
