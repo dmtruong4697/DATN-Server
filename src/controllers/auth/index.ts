@@ -102,8 +102,7 @@ const login = async (req: Request, res: Response): Promise<any> => {
         
         if (user?.password !== req.body.password) return res.status(401).json({ message: "Incorrect password" });
 
-        const tkIndex = user.deviceToken.indexOf(req.body.deviceToken);
-        if(tkIndex == -1) user.deviceToken.push(req.body.deviceToken);
+        user!.deviceToken = req.body.deviceToken;
         await user.save();
         
         const token = Jwt.sign({ id: user?.id }, secret, {
@@ -132,8 +131,7 @@ const logout = async (req: Request, res: Response): Promise<any> => {
 
         if (!user) return res.status(404).json({ message: "User not found" });
         
-        const tkIndex = user.deviceToken.indexOf(req.body.deviceToken);
-        if(tkIndex > -1) user.deviceToken.splice(tkIndex, 1);
+        user.deviceToken = '';
         await user.save();
 
         return res.status(200).json({ message: "Logout success" });

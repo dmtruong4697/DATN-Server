@@ -4,35 +4,46 @@ import { getMessaging } from "firebase-admin/messaging";
 import { Request, Response } from "express";
 import { app } from "../../config/firebase.config";
 
-const getTodayInactiveDeviceToken = async() : Promise<string[]> => {
-    try {
-        const deviceToken = [];
-        const users = await UserModel.find({
-            latestActive: new Date().toISOString().slice(0, 10),
-        });
+// const registrationToken = ['cMlkDr-GS8aU5xrTZks4NZ:APA91bELlZqg79jQB9ZsVYRCl324QeY1qIcXoCN52f-2JTVxaJKfxNlEQxJhndNafQZUYW3KMxxbCM_bobt95hxll2heNjVLNZCJaUmBZl-lQqKKXh-lvrkGeWtSRG1XKUKlR4WS36H2'];
 
-        users.map(user => {
+const getAllDeviceToken = async (): Promise<string[]> => {
+    try {
+        const users = await UserModel.find();
+        const deviceToken: string[] = [];
+
+        users.forEach((user) => {
             deviceToken.push(user.deviceToken);
         })
 
         return deviceToken;
-
     } catch (error) {
-        
+        console.log(error);
     }
 }
 
-const message = {
-    notification: {
-        title: 'Test Notification',
-        body: 'This is a Test Notification',
-    },
-    tokens: getTodayInactiveDeviceToken(),
-};
+// const message = {
+//     notification: {
+//         title: 'Test Notification',
+//         body: 'This is a Test Notification',
+//         imageUrl: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4wtct?ver=23bb',
+//     },
+//     tokens: getAllDeviceToken(),
+// };
 
-const sendActiveRemindNotification = async (req: Request, res: Response): Promise<void> => {
+const sendNotification = async (req: Request, res: Response): Promise<void> => {
     try {
-        await getMessaging(app).sendMulticast(message)
+        const tokens = await getAllDeviceToken();
+        await getMessaging(app).sendMulticast({
+            notification: {
+                title: req.body.title,
+                body: req.body.body,
+                imageUrl: req.body.imageUrl,
+            },
+            tokens: tokens,
+            data: {
+                type: 'new version'
+            }
+        })
             .then((resp) => {
                 // Response is a message ID string.
                 console.log('Successfully sent message:', resp);
@@ -44,6 +55,8 @@ const sendActiveRemindNotification = async (req: Request, res: Response): Promis
 
         
     } catch (error) {
-        res.status(500).json({ message: "controller group " + error});
+        res.status(500).json({ message: "controller noti " + error});
     }
 }
+
+export { sendNotification }

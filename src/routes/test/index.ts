@@ -6,7 +6,7 @@ import { unlink, unlinkSync } from "fs";
 
 const testRouter = express.Router();
 
-const registrationToken = 'c1wd4T8-QzuS920hOET6a8:APA91bFri_0BrXp5jy7Buc4HiNyodixiU8xf097umxYxO-tln4WCVAoJUGZVjHFRio7FQIkKcmpAHGNvbUVGqbV7btKHFNf8_7743-x9pU9tT4FieHqXtauXMF0_UmSL-b4-gj5EYMfY';
+const registrationToken = ['cMlkDr-GS8aU5xrTZks4NZ:APA91bELlZqg79jQB9ZsVYRCl324QeY1qIcXoCN52f-2JTVxaJKfxNlEQxJhndNafQZUYW3KMxxbCM_bobt95hxll2heNjVLNZCJaUmBZl-lQqKKXh-lvrkGeWtSRG1XKUKlR4WS36H2'];
 
 
 const message = {
@@ -15,12 +15,12 @@ const message = {
         body: 'This is a Test Notification',
         imageUrl: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4wtct?ver=23bb',
     },
-    token: registrationToken
+    tokens: registrationToken
 };
 
 const sendNoti = async (req: Request, res: Response): Promise<void> => {
     try {
-        await getMessaging(app).send(message)
+        await getMessaging(app).sendMulticast(message)
             .then((resp) => {
                 // Response is a message ID string.
                 console.log('Successfully sent message:', resp);
