@@ -51,6 +51,9 @@ const UserSchema = new Schema(
         deviceToken: {
                 type: String,
         },
+        googleId: {
+            type: String,
+        },
         latestActive: {
             type: String,
         },
