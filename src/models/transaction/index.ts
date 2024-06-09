@@ -21,6 +21,9 @@ const TransactionSchema = new Schema(
         createAt: {
             type: String,
         },
+        createTime: {
+            type: String,
+        },
         note: {
             type: String,
         },

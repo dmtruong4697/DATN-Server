@@ -19,6 +19,7 @@ const createTransaction = async (req: Request, res: Response): Promise<any> => {
             total: req.body.total,
             currencyUnit: group.currencyUnit,
             createAt: req.body.createAt,
+            createTime: req.body.createTime,
             note: req.body.note,
             imageUrls: [],
         });
