@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken } from "../../middlewares/verifyToken";
-import { createGroup, getGroupById, getGroupList, getGroupMember, getGroupTotal, joinGroupByInvitecode, leaveGroupById, splitMoney } from "../../controllers/group";
+import { createGroup, deleteGroup, getGroupById, getGroupList, getGroupMember, getGroupTotal, joinGroupByInvitecode, leaveGroupById, resetTransactions, splitMoney } from "../../controllers/group";
 
 const groupRouter = express.Router();
 
@@ -12,5 +12,7 @@ groupRouter.post("/group-list", verifyToken, getGroupList);
 groupRouter.post("/group-member", verifyToken, getGroupMember);
 groupRouter.post("/group-total", verifyToken, getGroupTotal);
 groupRouter.post("/split-money", verifyToken, splitMoney);
+groupRouter.post("/reset-transaction", verifyToken, resetTransactions);
+groupRouter.post("/delete-group", verifyToken, deleteGroup);
 
 export default groupRouter;

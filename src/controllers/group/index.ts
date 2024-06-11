@@ -283,6 +283,56 @@ const splitMoney = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
+const resetTransactions = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const group = await GroupModel.findById(req.body.groupId);
+        if (!group) return res.status(404).json({ message: "Group not found" });
+
+        const transactionIds = group.transactionIds;
+        
+        await TransactionModel.deleteMany({ _id: { $in: transactionIds } });
+
+        group.transactionIds = [];
+        await group.save();
+
+        await UserModel.updateMany(
+            { _id: { $in: group.memberIds } },
+            { $pull: { transactionIds: { $in: transactionIds } } }
+        );
+
+        return res.status(200).json({ message: "Reset Transactions Success" });
+
+    } catch (error) {
+        return res.status(500).json({ message: "controller transaction " + error });
+    }
+}
+
+
+const deleteGroup = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const group = await GroupModel.findById(req.body.groupId);
+        if (!group) return res.status(404).json({ message: "Group not found" });
+
+        const transactionIds = group.transactionIds;
+
+        await TransactionModel.deleteMany({ _id: { $in: transactionIds } });
+
+        await UserModel.updateMany(
+            { _id: { $in: group.memberIds } },
+            { $pull: { 
+                transactionIds: { $in: transactionIds } ,
+                groupIds: group._id
+            } }
+        );
+
+        await GroupModel.findByIdAndDelete(req.body.groupId);
+
+        return res.status(200).json({ message: "Delete Group Success" });
+
+    } catch (error) {
+        return res.status(500).json({ message: "controller transaction " + error });
+    }
+}
 
 export {
     createGroup, 
@@ -293,4 +343,6 @@ export {
     leaveGroupById,
     getGroupTotal,
     splitMoney,
+    resetTransactions,
+    deleteGroup,
 }

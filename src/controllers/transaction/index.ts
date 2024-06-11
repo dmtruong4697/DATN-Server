@@ -74,5 +74,34 @@ const getTransactionByGroupId = async (req: Request, res: Response): Promise<any
     }
 }
 
+const deleteTransaction = async (req: Request, res: Response): Promise<any> => {
+    try {
+        
+        const user = await UserModel.findById(req.body.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-export {createTransaction, getTransactionById, getTransactionByGroupId}
+        const group = await GroupModel.findById(req.body.groupId);
+        if( !group) return res.status(404).json({ message: "Group not found" });
+
+        const transaction = await TransactionModel.findById(req.body.transactionId);
+        if (!transaction) return res.status(404).json({ message: "Transaction not found" });
+
+        group.transactionIds = group.transactionIds.filter(id => id.toString() !== transaction._id.toString());
+
+        user.transactionIds = user.transactionIds.filter(id => id.toString() !== transaction._id.toString());
+
+        await user.save();
+        await group.save();
+
+        await transaction.deleteOne();
+
+        return res.status(200).json({ message: "Delete Transaction Success" });
+        
+        
+    } catch (error) {
+        return res.status(500).json({ message: "controller transaction " + error});
+    }
+}
+
+
+export {createTransaction, getTransactionById, getTransactionByGroupId, deleteTransaction}
