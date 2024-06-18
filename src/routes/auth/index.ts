@@ -35,7 +35,7 @@ authRouter.post('/google-auth', async (req: Request, res: Response) => {
         userName: googleUser.name,
         email: googleUser.email,
         password: '',
-        avatarImage: '',
+        avatarImage: googleUser.avatarImage,
         phoneNumber: '',
         groupIds: [],
         dataUrl: '',
@@ -61,16 +61,17 @@ authRouter.post('/google-auth', async (req: Request, res: Response) => {
   
   async function verifyGoogleToken(token) {
     const { OAuth2Client } = require('google-auth-library');
-    const client = new OAuth2Client('159333030534-j4fbdio5te9oio6olrk2c2tl6nev6rm7.apps.googleusercontent.com');
+    const client = new OAuth2Client('159333030534-3cqvdt5pvtvrgmate5plem0tcl5o1e5p.apps.googleusercontent.com');
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: '159333030534-j4fbdio5te9oio6olrk2c2tl6nev6rm7.apps.googleusercontent.com'
+      audience: '159333030534-3cqvdt5pvtvrgmate5plem0tcl5o1e5p.apps.googleusercontent.com'
     });
     const payload = ticket.getPayload();
     return {
       id: payload['sub'],
       email: payload['email'],
       name: payload['name'],
+      avatarImage: payload['picture'],
     };
   }
 export default authRouter;
