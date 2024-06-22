@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import UserModel from "../../models/user";
 import GroupModel from "../../models/group";
 import TransactionModel from "../../models/transaction";
+import { getMessaging } from "firebase-admin/messaging";
+import { app } from "../../config/firebase.config";
 
 function generateCode(): string {
     let result = '';
@@ -11,6 +13,34 @@ function generateCode(): string {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+
+const sendNotification = async (tokens: string[], groupName: string, userName: string): Promise<void> => {
+    try {
+        await getMessaging(app).sendMulticast({
+            notification: {
+                title: groupName,
+                body: `${userName} has just joined your group`,
+                // imageUrl: req.body.imageUrl,
+            },
+            tokens: tokens,
+            data: {
+                type: 'group noti'
+            }
+        })
+            .then((resp) => {
+                // Response is a message ID string.
+                console.log('Successfully sent message:', resp);
+                // res.status(200).json({ message: "send noti success" })
+            })
+            .catch((error) => {
+                console.log('Error sending message:', error);
+            });
+
+        
+    } catch (error) {
+        // res.status(500).json({ message: "controller noti " + error});
+    }
 }
 
 const createGroup = async (req: Request, res: Response): Promise<any> => {
@@ -78,6 +108,18 @@ const joinGroupByInvitecode = async (req: Request, res: Response): Promise<any> 
 
         user.groupIds.push(group._id);
         await user.save();
+
+        const memberIds = group.memberIds;
+        const deviceTokens = [];
+
+        for (const memberId of memberIds) {
+            const member = await UserModel.findById(memberId);
+            if (member && member.deviceToken) {
+                deviceTokens.push(member.deviceToken);
+            }
+        }
+
+        await sendNotification(deviceTokens, group.name, user.userName);
 
         return res.status(200).json({ message: "Join Group successful", group });
 
